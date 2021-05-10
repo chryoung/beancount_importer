@@ -1,12 +1,13 @@
 from os import path
 
 from PyQt5.Qt import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import pyqtSlot, QModelIndex
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QDialog
 
-from ui_select_account_dialog import Ui_Dialog
-from tree import Node
 from beancount_account import generate_account_hierarchy
+from tree import Node
+from ui_select_account_dialog import Ui_Dialog
+
 
 class AccountItemModel(QStandardItemModel):
     def __init__(self, account_hierarchy: Node):
@@ -16,23 +17,22 @@ class AccountItemModel(QStandardItemModel):
 
     def _generate_model(self, account_hierarchy: Node):
         stack = [account_hierarchy]
-        path = []
         while stack:
             account: Node = stack.pop()
             # push all children
             stack += sorted(account.children, key=lambda a: a.value, reverse=True)
-            path = [account]
+            path_of_account = [account]
             # reach to root
             while account.parent is not None:
-                path.append(account.parent)
+                path_of_account.append(account.parent)
                 account = account.parent
             # pop root from path
-            account_seg: Node = path.pop()
+            account_seg: Node = path_of_account.pop()
             # get root of the data model
             tree_model_node: QStandardItem = self.root_node
             # append the whole path to data model
-            while path:
-                account_seg = path.pop()
+            while path_of_account:
+                account_seg = path_of_account.pop()
                 tree_model_child: QStandardItem = None
                 # find corresponding node in the data model
                 for child_idx in range(tree_model_node.rowCount()):
@@ -67,21 +67,21 @@ class SelectAccountDialog(QDialog):
         self.ui.setupUi(self)
         self.ui.accountTreeView.setModel(self.account_model)
         self.ui.accountTreeView.setHeaderHidden(True)
-        self.ui.accountTreeView.clicked.connect(self.showAccountFullName)
+        self.ui.accountTreeView.clicked.connect(self.show_account_full_name)
 
-    def get_selection(self) -> str:
+    def get_selected_account(self) -> str:
         indexes = self.ui.accountTreeView.selectedIndexes()
         if not indexes:
             return ''
 
         index: QModelIndex = self.ui.accountTreeView.selectedIndexes()[0]
         item: QStandardItem = self.account_model.itemFromIndex(index)
-        path = []
+        path_of_item = []
         while item is not None:
-            path.append(item.text())
+            path_of_item.append(item.text())
             item = item.parent()
 
-        return ':'.join(reversed(path))
+        return ':'.join(reversed(path_of_item))
 
-    def showAccountFullName(self, index):
-        self.ui.accountFullName.setText(self.get_selection())
+    def show_account_full_name(self, index):
+        self.ui.accountFullName.setText(self.get_selected_account())

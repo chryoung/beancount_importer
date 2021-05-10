@@ -26,6 +26,7 @@ class Node:
     def is_leaf(self):
         return not self.children
 
+
 def print_tree_dfs(root: Node, level=0):
     print(' ' * level + root.value)
     for child in root.children:

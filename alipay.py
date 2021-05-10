@@ -1,8 +1,8 @@
 import datetime
+import json
+import os
 import pprint
 import sys
-import os
-import json
 from typing import List, Dict
 
 alipay_journal = sys.argv[1]
@@ -42,7 +42,7 @@ with open('./data/payee_to_account.json') as payee_to_account_file:
 CURRENCY = 'CNY'
 
 
-def format_amount(amount: float, precision: int=2):
+def format_amount(amount: float, precision: int = 2):
     fmt = '{:.' + str(precision) + 'f}'
     return fmt.format(amount)
 
@@ -83,7 +83,8 @@ for t_idx in range(len(transactions)):
 
 # convert to beancount transaction
 try:
-    beancount_transaction = [convert_transaction_to_beancount(t) for t in transactions if t[FI_TRANSACTION_STATE] not in IGNORE_STATE]
+    beancount_transaction = [convert_transaction_to_beancount(t) for t in transactions if
+                             t[FI_TRANSACTION_STATE] not in IGNORE_STATE]
 except Exception as e:
     with open('debug_transaction.txt', 'w') as debug_out:
         pprint.pprint(transactions, debug_out)

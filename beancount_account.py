@@ -1,12 +1,13 @@
-#!/usr/bin/env python3
-# coding: utf-8
-import beancount.loader
 import beancount.core
+import beancount.loader
+
 from tree import Node
 
-def generate_account_hierarchy(account_file: str):
-    (entries, _, _) = beancount.loader.load_file(account_file)
-    accounts = [e.account for e in entries if type(e) == beancount.core.data.Open and e.meta['filename'] != "<unrealized_gains>"]
+
+def generate_account_hierarchy(beancount_file: str) -> Node:
+    (entries, _, _) = beancount.loader.load_file(beancount_file)
+    accounts = [e.account for e in entries if
+                type(e) == beancount.core.data.Open and e.meta['filename'] != '<unrealized_gains>']
     root_node = Node('root')
     for account in accounts:
         segments = account.split(':')
@@ -17,3 +18,9 @@ def generate_account_hierarchy(account_file: str):
             node = node.get_child(cur_seg)
 
     return root_node
+
+
+def get_operating_currencies(beancount_file: str) -> list:
+    (_, _, options) = beancount.loader.load_file(beancount_file)
+
+    return options['operating_currency']
