@@ -14,6 +14,7 @@ from gui.ui_main_window import Ui_MainWindow
 from gui.transaction_view_delegate import TransactionViewDelegate
 from beancount_account import get_operating_currencies, generate_account_hierarchy
 from fmt import format_transaction
+from tree import Node
 
 
 class MainWindow(QMainWindow):
@@ -51,15 +52,19 @@ class MainWindow(QMainWindow):
         self.ui.importBtn.clicked.connect(self.import_transaction)
 
     def setup_beancount_option(self, beancount_file: str):
-        accounts = generate_account_hierarchy(beancount_file)
+        try:
+            accounts = generate_account_hierarchy(beancount_file)
+            app_config.beancount_currency = get_operating_currencies(beancount_file)
+        except Exception as e:
+            accounts = Node('root')
+            app_config.beancount_currency = []
+            QMessageBox.critical(self, self.tr('Error'), self.tr('Failed to load beancount file: {0}').format(e))
         self.select_account_dialog = SelectAccountDialog(accounts, parent=self)
         self.select_account_dialog.setupUi()
         self.transaction_view_delegate.select_account_dialog = self.select_account_dialog
-        app_config.beancount_currency = get_operating_currencies(beancount_file)
-        if hasattr(self.ui, 'defaultCurrencyComboBox'):
-            self.ui.defaultCurrencyComboBox.clear()
-            for currency in app_config.beancount_currency:
-                self.ui.defaultCurrencyComboBox.addItem(currency)
+        self.ui.defaultCurrencyComboBox.clear()
+        for currency in app_config.beancount_currency:
+            self.ui.defaultCurrencyComboBox.addItem(currency)
 
     def select_beancount_file(self):
         recent_beancount_path = path.dirname(app_config.recent_beancount_file)

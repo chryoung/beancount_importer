@@ -6,6 +6,9 @@ from tree import Node
 
 
 def generate_account_hierarchy(beancount_file: str) -> Node:
+    if not os.path.isfile(beancount_file):
+        return Node('root')
+
     (entries, _, _) = beancount.loader.load_file(beancount_file)
     accounts = [e.account for e in entries if
                 type(e) == beancount.core.data.Open and e.meta['filename'] != '<unrealized_gains>']

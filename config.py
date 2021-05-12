@@ -1,6 +1,5 @@
 import json
-from os import path
-from tree import Node
+from os import path, mkdir
 
 
 class Config:
@@ -92,4 +91,8 @@ class Config:
     def import_to_file(self, value):
         self._config_json[self.IMPORT_TO_FILE] = value
 
-app_config = Config('./data/config.json', './data/payee_to_account.json')
+_data_path = './data'
+if not path.isdir(_data_path):
+    mkdir(_data_path)
+
+app_config = Config(F'{_data_path}/config.json', F'{_data_path}/payee_to_account.json')
