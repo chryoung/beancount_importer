@@ -20,11 +20,9 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
-        self.beancount_file = ''
         self.alipay_csv = ''
         self.transaction_item_model = TransactionItemModel([])
         self.transaction_view_delegate = TransactionViewDelegate(self)
-        self.setup_beancount_option(self.beancount_file)
 
     def setupUi(self):
         self.ui.setupUi(self)
@@ -32,7 +30,9 @@ class MainWindow(QMainWindow):
         self.ui.openAlipayCsvAction.triggered.connect(self.open_alipay_csv)
         self.ui.selectPaymentAccountBtn.clicked.connect(self.select_default_payment_account)
         self.ui.selectExpensesAccountBtn.clicked.connect(self.select_default_expenses_account)
-        self.ui.defaultCurrencyComboBox.currentTextChanged.connect(self.select_default_currency)
+        self.ui.defaultCurrencyComboBox.currentTextChanged.connect(self.set_default_currency)
+        self.ui.defaultPaymentAccountLE.textChanged.connect(self.set_default_payment_account)
+        self.ui.defaultExpensesAccountLE.textChanged.connect(self.set_default_expenses_account)
 
         # setup default value
         self.ui.defaultPaymentAccountLE.setText(app_config.default_payment_account)
@@ -51,9 +51,11 @@ class MainWindow(QMainWindow):
         self.ui.importBtn.clicked.connect(self.import_transaction)
 
     def setup_beancount_option(self, beancount_file: str):
-        self.select_account_dialog = SelectAccountDialog(app_config.beancount_account, parent=self)
+        accounts = generate_account_hierarchy(beancount_file)
+        self.select_account_dialog = SelectAccountDialog(accounts, parent=self)
         self.select_account_dialog.setupUi()
         self.transaction_view_delegate.select_account_dialog = self.select_account_dialog
+        app_config.beancount_currency = get_operating_currencies(beancount_file)
         if hasattr(self.ui, 'defaultCurrencyComboBox'):
             self.ui.defaultCurrencyComboBox.clear()
             for currency in app_config.beancount_currency:
@@ -61,32 +63,35 @@ class MainWindow(QMainWindow):
 
     def select_beancount_file(self):
         recent_beancount_path = path.dirname(app_config.recent_beancount_file)
-        self.beancount_file = QFileDialog.getOpenFileName(self, self.tr('Open beancount file'), recent_beancount_path,
-                                                          'beancount (*.beancount *.bc *.txt)')[0]
-        if not os.path.isfile(self.beancount_file):
+        app_config.recent_beancount_file = QFileDialog.getOpenFileName(self, self.tr('Open beancount file'), recent_beancount_path,
+                                                                       'beancount (*.beancount *.bc *.txt)')[0]
+        if not os.path.isfile(app_config.recent_beancount_file):
             return
-        app_config.recent_beancount_file = self.beancount_file
-        app_config.beancount_account = generate_account_hierarchy(self.beancount_file)
-        app_config.beancount_currency = get_operating_currencies(self.beancount_file)
-        self.setup_beancount_option(self.beancount_file)
+        self.setup_beancount_option(app_config.recent_beancount_file)
+
+    def set_default_payment_account(self, account):
+        self.ui.defaultPaymentAccountLE.setText(account)
+        app_config.default_payment_account = account
+        self.transaction_item_model.update_transactions_data(
+            self._gen_func_set_transaction_account_with_default_value())
 
     def select_default_payment_account(self):
         if self.select_account_dialog.exec() == QDialog.Accepted:
             account = self.select_account_dialog.get_selected_account()
-            self.ui.defaultPaymentAccountLE.setText(account)
-            app_config.default_payment_account = account
-            self.transaction_item_model.update_transactions_data(
-                self._gen_func_set_transaction_account_with_default_value())
+            self.set_default_payment_account(account)
+
+    def set_default_expenses_account(self, account):
+        self.ui.defaultExpensesAccountLE.setText(account)
+        app_config.default_expenses_account = account
+        self.transaction_item_model.update_transactions_data(
+            self._gen_func_set_transaction_account_with_default_value())
 
     def select_default_expenses_account(self):
         if self.select_account_dialog.exec() == QDialog.Accepted:
             account = self.select_account_dialog.get_selected_account()
-            self.ui.defaultExpensesAccountLE.setText(account)
-            app_config.default_expenses_account = account
-            self.transaction_item_model.update_transactions_data(
-                self._gen_func_set_transaction_account_with_default_value())
+            self.set_default_expenses_account(account)
 
-    def select_default_currency(self, currency):
+    def set_default_currency(self, currency):
         app_config.default_currency = currency
         self.transaction_item_model.update_transactions_data(
             self._gen_func_set_transaction_currency_with_default_value())

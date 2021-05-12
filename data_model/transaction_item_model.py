@@ -103,12 +103,15 @@ class TransactionItemModel(QAbstractTableModel):
                 except:
                     return False
             elif col == TransactionItemModelHeaderIndex.CURRENCY:
+                self.transactions[row].is_modified = (self.transactions[row].is_modified or (self.transactions[row].currency != value))
                 self.transactions[row].currency = value
                 return True
             elif col == TransactionItemModelHeaderIndex.FROM_ACCOUNT:
+                self.transactions[row].is_modified = (self.transactions[row].is_modified or (self.transactions[row].from_account != value))
                 self.transactions[row].from_account = value
                 return True
             elif col == TransactionItemModelHeaderIndex.TO_ACCOUNT:
+                self.transactions[row].is_modified = (self.transactions[row].is_modified or (self.transactions[row].to_account != value))
                 self.transactions[row].to_account = value
                 return True
             elif col == TransactionItemModelHeaderIndex.PAYEE:

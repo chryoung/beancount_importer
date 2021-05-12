@@ -16,6 +16,7 @@ app = QApplication(sys.argv)
 app.lastWindowClosed.connect(on_last_window_closed)
 main_window = MainWindow()
 main_window.setupUi()
+main_window.setup_beancount_option(app_config.recent_beancount_file)
 main_window.show()
 
 sys.exit(app.exec_())

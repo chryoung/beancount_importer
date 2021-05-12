@@ -17,7 +17,6 @@ class Config:
         self._config_json = self.try_load_json(self._config_file)
         self._payee_account_map_file = payee_account_map_file
         self.payee_account_map = self.try_load_json(self._payee_account_map_file)
-        self.beancount_account = Node('root')
         self.beancount_currency = []
 
     @staticmethod
