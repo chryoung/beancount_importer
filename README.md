@@ -37,6 +37,7 @@ python3 main.py
 - [ ] i18n
 - [ ] Select by date range
 - [ ] Separate from account and to account dialog
+- [ ] Save undone work
 
 ## Thanks
 
