@@ -10,7 +10,7 @@ class Config:
     DEFAULT_PAYMENT_ACCOUNT = 'default_payment_account'
     DEFAULT_EXPENSES_ACCOUNT = 'default_expenses_account'
     DEFAULT_CURRENCY = 'default_currency'
-    EXPORT_FILE = 'export_file'
+    IMPORT_TO_FILE = 'import_to_file'
 
     def __init__(self, config_file: str, payee_account_map_file: str):
         self._config_file = config_file
@@ -86,11 +86,11 @@ class Config:
         self._config_json[self.DEFAULT_CURRENCY] = value
 
     @property
-    def export_file(self):
-        return self._config_json.get(self.EXPORT_FILE)
+    def import_to_file(self):
+        return self._config_json.get(self.IMPORT_TO_FILE)
 
-    @export_file.setter
-    def export_file(self, value):
-        self._config_json[self.EXPORT_FILE] = value
+    @import_to_file.setter
+    def import_to_file(self, value):
+        self._config_json[self.IMPORT_TO_FILE] = value
 
 app_config = Config('./data/config.json', './data/payee_to_account.json')

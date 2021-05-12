@@ -43,12 +43,12 @@ class MainWindow(QMainWindow):
         self.ui.transactionTableView.setModel(self.transaction_item_model)
         self.ui.transactionTableView.setItemDelegate(self.transaction_view_delegate)
 
-        # setup export component
+        # setup import component
         open_file_icon = QIcon('./resources/icon/folder-open-line.svg')
-        self.ui.exportPathLE.setText(app_config.export_file)
-        exportPathLE_action = self.ui.exportPathLE.addAction(open_file_icon, QLineEdit.ActionPosition.TrailingPosition)
-        exportPathLE_action.triggered.connect(self.select_export_file)
-        self.ui.exportBtn.clicked.connect(self.export_transaction)
+        self.ui.importToPathLE.setText(app_config.import_to_file)
+        importToPathLE_action = self.ui.importToPathLE.addAction(open_file_icon, QLineEdit.ActionPosition.TrailingPosition)
+        importToPathLE_action.triggered.connect(self.select_import_file)
+        self.ui.importBtn.clicked.connect(self.import_transaction)
 
     def setup_beancount_option(self, beancount_file: str):
         self.select_account_dialog = SelectAccountDialog(app_config.beancount_account, parent=self)
@@ -108,11 +108,11 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, self.tr('Failed to open Alipay csv'), self.tr('Failed to open Alipay csv: ') + str(e))
 
-    def select_export_file(self):
-        export_file = QFileDialog.getSaveFileName(self, self.tr('Export to'), '/', 'beancount (*.beancount *.txt)')
-        if export_file[0]:
-            self.ui.exportPathLE.setText(export_file[0])
-            app_config.export_file = export_file[0]
+    def select_import_file(self):
+        import_file = QFileDialog.getSaveFileName(self, self.tr('Import to'), '/', 'beancount (*.beancount *.txt)')
+        if import_file[0]:
+            self.ui.importToPathLE.setText(import_file[0])
+            app_config.import_to_file = import_file[0]
 
     def _gen_func_set_transaction_account_with_default_value(self) -> Callable[[Transaction], None]:
         default_payment_account = self.ui.defaultPaymentAccountLE.text()
@@ -132,16 +132,17 @@ class MainWindow(QMainWindow):
 
         return set_currency
 
-    def export_transaction(self):
-        export_file = self.ui.exportPathLE.text()
-        if not export_file:
-            QMessageBox.warning(self, self.tr('Export path is not set!'), self.tr('Export path is not set! Please set an export path first.'))
+    def import_transaction(self):
+        import_file = self.ui.importToPathLE.text()
+        if not import_file:
+            QMessageBox.warning(self, self.tr('Import path is not set!'), self.tr('Import path is not set! Please set an import path first.'))
             return
 
-        transactions_text = '\n'.join([format_transaction(tx) for tx in self.transaction_item_model.transactions if tx.will_export])
+        transaction_text_lines = [format_transaction(tx) for tx in self.transaction_item_model.transactions if tx.will_import]
+        transactions_text = '\n'.join(transaction_text_lines)
         try:
-            with open(export_file, 'a', encoding='utf-8') as export_file_fs:
-                export_file_fs.write(transactions_text)
-            QMessageBox.information(self, self.tr('Exported'), self.tr('Exported'))
+            with open(import_file, 'a', encoding='utf-8') as import_file_fs:
+                import_file_fs.write(transactions_text)
+            QMessageBox.information(self, self.tr('Imported'), self.tr('Imported {0} transactions').format(len(transaction_text_lines)))
         except IOError as e:
-            QMessageBox.critical(self, self.tr('Cannot export transactions'), self.tr('Cannot export transactions: ') + str(e))
+            QMessageBox.critical(self, self.tr('Cannot import transactions'), self.tr('Cannot import transactions: ') + str(e))

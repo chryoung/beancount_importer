@@ -9,7 +9,7 @@ from .transaction import Transaction
 tr = QCoreApplication.translate
 
 class TransactionItemModelHeaderIndex(IntEnum):
-    EXPORT = 0
+    IMPORT = 0
     TRANSACTION_DATE = 1
     AMOUNT = 2
     CURRENCY = 3
@@ -22,7 +22,7 @@ class TransactionItemModelHeaderIndex(IntEnum):
 
 class TransactionItemModel(QAbstractTableModel):
     HEADERS = [
-        tr('TransactionItemModel', 'Export'),
+        tr('TransactionItemModel', 'Import'),
         tr('TransactionItemModel', 'Transaction date'),
         tr('TransactionItemModel', 'Amount'),
         tr('TransactionItemModel', 'Currency'),
@@ -61,8 +61,8 @@ class TransactionItemModel(QAbstractTableModel):
 
         transaction = self.transactions[row]
 
-        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.EXPORT:
-            return Qt.Checked if transaction.will_export else Qt.Unchecked
+        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
+            return Qt.Checked if transaction.will_import else Qt.Unchecked
         elif role == Qt.DisplayRole or role == Qt.EditRole:
             if col == TransactionItemModelHeaderIndex.TRANSACTION_DATE:
                 return str(transaction.transaction_date)
@@ -88,8 +88,8 @@ class TransactionItemModel(QAbstractTableModel):
         if row >= len(self.transactions) or col >= TransactionItemModelHeaderIndex.END:
             return False
 
-        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.EXPORT:
-            self.transactions[row].will_export = (value == Qt.Checked)
+        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
+            self.transactions[row].will_import = (value == Qt.Checked)
             return True
         elif role == Qt.EditRole:
             if col == TransactionItemModelHeaderIndex.AMOUNT:
@@ -121,7 +121,7 @@ class TransactionItemModel(QAbstractTableModel):
         return False
 
     def flags(self, index):
-        if index.column() == TransactionItemModelHeaderIndex.EXPORT:
+        if index.column() == TransactionItemModelHeaderIndex.IMPORT:
             return super().flags(index) | Qt.ItemIsUserCheckable
         else:
             return super().flags(index) | Qt.ItemIsEditable
