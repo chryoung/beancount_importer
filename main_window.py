@@ -20,6 +20,7 @@ class MainWindow(QMainWindow):
         self.beancount_file = ''
         self.alipay_csv = ''
         self.transaction_item_model = TransactionItemModel([])
+        self.transaction_view_delegate = TransactionViewDelegate(self)
         self.setup_beancount_option(self.beancount_file)
 
     def setupUi(self):
@@ -37,11 +38,12 @@ class MainWindow(QMainWindow):
 
         # setup transaction table view
         self.ui.transactionTableView.setModel(self.transaction_item_model)
-        self.ui.transactionTableView.setItemDelegate(TransactionViewDelegate(self))
+        self.ui.transactionTableView.setItemDelegate(self.transaction_view_delegate)
 
     def setup_beancount_option(self, beancount_file: str):
         self.select_account_dialog = SelectAccountDialog(app_config.beancount_account, parent=self)
         self.select_account_dialog.setupUi()
+        self.transaction_view_delegate.select_account_dialog = self.select_account_dialog
         if hasattr(self.ui, 'defaultCurrencyComboBox'):
             self.ui.defaultCurrencyComboBox.clear()
             for currency in app_config.beancount_currency:

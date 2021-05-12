@@ -44,7 +44,7 @@ class TransactionItemModel(QAbstractTableModel):
     def headerData(self, section: int, orientation: Qt.Orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
-                if section <= len(self.HEADERS):
+                if section < TransactionItemModelHeaderIndex.END:
                     return self.HEADERS[section]
             elif orientation == Qt.Vertical:
                 return section + 1
