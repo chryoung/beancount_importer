@@ -14,7 +14,7 @@ from gui.ui_main_window import Ui_MainWindow
 from gui.transaction_view_delegate import TransactionViewDelegate
 from beancount_account import get_operating_currencies, generate_account_hierarchy
 from fmt import format_transaction
-from tree import Node
+from data_model.tree import Node
 
 
 class MainWindow(QMainWindow):

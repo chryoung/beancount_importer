@@ -2,7 +2,7 @@ import beancount.core
 import beancount.loader
 import os
 
-from tree import Node
+from data_model.tree import Node
 
 
 def generate_account_hierarchy(beancount_file: str) -> Node:
