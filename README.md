@@ -35,6 +35,8 @@ python3 main.py
 - [ ] Generate payee to account map based on beancount file
 - [ ] Prevent duplicate transaction
 - [ ] i18n
+- [ ] Select by date range
+- [ ] Separate from account and to account dialog
 
 ## Thanks
 
