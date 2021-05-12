@@ -19,7 +19,7 @@ python3 main.py
 ## Todo
 
 - [ ] Add date selector
-- [ ] Add wechat parser
+- [ ] Add wechat importer
 - [ ] Generate payee to account map based on beancount file
 - [ ] Prevent duplicate transaction
 - [ ] i18n
