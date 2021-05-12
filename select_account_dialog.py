@@ -4,7 +4,6 @@ from PyQt5.Qt import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QDialog
 
-from beancount_account import generate_account_hierarchy
 from tree import Node
 from ui_select_account_dialog import Ui_Dialog
 
@@ -54,14 +53,10 @@ class AccountItemModel(QStandardItemModel):
 
 
 class SelectAccountDialog(QDialog):
-    def __init__(self, account_file: str, parent=None):
+    def __init__(self, account_hierarchy: Node, parent=None):
         super().__init__(parent)
         self.ui = Ui_Dialog()
-        account_hierarchy = Node('root')
         self.account_model = AccountItemModel(account_hierarchy)
-        if path.isfile(account_file):
-            account_hierarchy = generate_account_hierarchy(account_file)
-            self.account_model = AccountItemModel(account_hierarchy)
 
     def setupUi(self):
         self.ui.setupUi(self)

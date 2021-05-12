@@ -1,12 +1,25 @@
 from typing import List, Callable
+from enum import IntEnum
+import datetime
 
 from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
 
 from transaction import Transaction
 
 
+class TransactionItemModelHeaderIndex(IntEnum):
+    IMPORT = 0
+    TRANSACTION_DATE = 1
+    AMOUNT = 2
+    CURRENCY = 3
+    FROM_ACCOUNT = 4
+    TO_ACCOUNT = 5
+    PAYEE = 6
+    DESCRIPTION = 7
+    END = 8
+
+
 class TransactionItemModel(QAbstractTableModel):
-    NUM_COLUMNS = 8
     HEADERS = [
         'Import',
         'Transaction date',
@@ -23,7 +36,7 @@ class TransactionItemModel(QAbstractTableModel):
         self.transactions = transactions
 
     def columnCount(self, parent=None) -> int:
-        return self.NUM_COLUMNS
+        return TransactionItemModelHeaderIndex.END
 
     def rowCount(self, parent=None) -> int:
         return len(self.transactions)
@@ -33,6 +46,8 @@ class TransactionItemModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 if section <= len(self.HEADERS):
                     return self.HEADERS[section]
+            elif orientation == Qt.Vertical:
+                return section + 1
 
         return None
 
@@ -40,34 +55,75 @@ class TransactionItemModel(QAbstractTableModel):
         row = index.row()
         col = index.column()
 
-        if row > len(self.transactions):
-            return None
-
-        if col > len(self.HEADERS):
+        if row >= len(self.transactions) or col >= TransactionItemModelHeaderIndex.END:
             return None
 
         transaction = self.transactions[row]
 
-        if role == Qt.CheckStateRole and col == 0:
+        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
             return Qt.Checked if transaction.will_import else Qt.Unchecked
-
-        if role == Qt.DisplayRole:
-            if col == 1:
+        elif role == Qt.DisplayRole or role == Qt.EditRole:
+            if col == TransactionItemModelHeaderIndex.TRANSACTION_DATE:
                 return str(transaction.transaction_date)
-            elif col == 2:
+            elif col == TransactionItemModelHeaderIndex.AMOUNT:
                 return transaction.amount
-            elif col == 3:
+            elif col == TransactionItemModelHeaderIndex.CURRENCY:
                 return transaction.currency
-            elif col == 4:
+            elif col == TransactionItemModelHeaderIndex.FROM_ACCOUNT:
                 return transaction.from_account
-            elif col == 5:
+            elif col == TransactionItemModelHeaderIndex.TO_ACCOUNT:
                 return transaction.to_account
-            elif col == 6:
+            elif col == TransactionItemModelHeaderIndex.PAYEE:
                 return transaction.payee
-            elif col == 7:
+            elif col == TransactionItemModelHeaderIndex.DESCRIPTION:
                 return transaction.description
 
         return None
+
+    def setData(self, index: QModelIndex, value, role: int = Qt.EditRole) -> bool:
+        row = index.row()
+        col = index.column()
+
+        if row >= len(self.transactions) or col >= TransactionItemModelHeaderIndex.END:
+            return False
+
+        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
+            self.transactions[row].will_import = (value == Qt.Checked)
+            return True
+        elif role == Qt.EditRole:
+            if col == TransactionItemModelHeaderIndex.AMOUNT:
+                self.transactions[row].amount = value
+                return True
+            elif col == TransactionItemModelHeaderIndex.TRANSACTION_DATE:
+                try:
+                    transaction_date = datetime.datetime.strptime(value, '%Y-%m-%d').date()
+                    self.transactions[row].transaction_date = transaction_date
+                    return True
+                except:
+                    return False
+            elif col == TransactionItemModelHeaderIndex.CURRENCY:
+                self.transactions[row].currency = value
+                return True
+            elif col == TransactionItemModelHeaderIndex.FROM_ACCOUNT:
+                self.transactions[row].from_account = value
+                return True
+            elif col == TransactionItemModelHeaderIndex.TO_ACCOUNT:
+                self.transactions[row].to_account = value
+                return True
+            elif col == TransactionItemModelHeaderIndex.PAYEE:
+                self.transactions[row].payee = value
+                return True
+            elif col == TransactionItemModelHeaderIndex.DESCRIPTION:
+                self.transactions[row].description = value
+                return True
+
+        return False
+
+    def flags(self, index):
+        if index.column() == TransactionItemModelHeaderIndex.IMPORT:
+            return super().flags(index) | Qt.ItemIsUserCheckable
+        else:
+            return super().flags(index) | Qt.ItemIsEditable
 
     def set_transactions_data(self, transactions: List[Transaction]):
         self.layoutAboutToBeChanged.emit()

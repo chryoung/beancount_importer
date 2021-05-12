@@ -1,5 +1,6 @@
 import beancount.core
 import beancount.loader
+import os
 
 from tree import Node
 
@@ -21,6 +22,9 @@ def generate_account_hierarchy(beancount_file: str) -> Node:
 
 
 def get_operating_currencies(beancount_file: str) -> list:
+    if not os.path.isfile(beancount_file):
+        return []
+
     (_, _, options) = beancount.loader.load_file(beancount_file)
 
     return options['operating_currency']

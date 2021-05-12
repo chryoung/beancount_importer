@@ -1,17 +1,23 @@
 import json
 from os import path
+from tree import Node
 
 
 class Config:
     RECENT_BEANCOUNT_FILE = 'recent_beancount_file'
     RECENT_ALIPAY_FILE = 'recnet_alipay_file'
     RECENT_WECHAT_FILE = 'recent_wechat_file'
+    DEFAULT_PAYMENT_ACCOUNT = 'default_payment_account '
+    DEFAULT_EXPENSES_ACCOUNT = 'default_expenses_account '
+    DEFAULT_CURRENCY = 'default_currency '
 
     def __init__(self, config_file: str, payee_account_map_file: str):
         self._config_file = config_file
         self._config_json = self.try_load_json(self._config_file)
         self._payee_account_map_file = payee_account_map_file
         self.payee_account_map = self.try_load_json(self._payee_account_map_file)
+        self.beancount_account = Node('root')
+        self.beancount_currency = []
 
     @staticmethod
     def try_load_json(json_file_path: str) -> {}:
@@ -20,6 +26,12 @@ class Config:
                 return json.load(fs)
         except:
             return {}
+
+    def save(self):
+        with open(self._config_file, 'w', encoding='utf-8') as config:
+            json.dump(self._config_json, config, indent=4)
+        with open(self._payee_account_map_file, 'w', encoding='utf-8') as payee_account_map_fs:
+            json.dump(self.payee_account_map, payee_account_map_fs, indent=4)
 
     @property
     def recent_beancount_file(self):
@@ -48,11 +60,29 @@ class Config:
         if path.isfile(file):
             self._config_json[self.RECENT_WECHAT_FILE] = file
 
-    def save(self):
-        with open(self._config_file, 'w', encoding='utf-8') as config:
-            json.dump(self._config_json, config)
-        with open(self._payee_account_map_file, 'w', encoding='utf-8') as payee_account_map_fs:
-            json.dump(self.payee_account_map, payee_account_map_fs)
+    @property
+    def default_payment_account(self):
+        return self._config_json.get(self.DEFAULT_PAYMENT_ACCOUNT)
+
+    @default_payment_account.setter
+    def default_payment_account(self, value):
+        self._config_json[self.DEFAULT_PAYMENT_ACCOUNT] = value
+
+    @property
+    def default_expenses_account(self):
+        return self._config_json.get(self.DEFAULT_EXPENSES_ACCOUNT)
+
+    @default_expenses_account.setter
+    def default_expenses_account(self, value):
+        self._config_json[self.DEFAULT_EXPENSES_ACCOUNT] = value
+
+    @property
+    def default_currency(self):
+        return self._config_json.get(self.DEFAULT_CURRENCY)
+
+    @default_currency.setter
+    def default_currency(self, value):
+        self._config_json[self.DEFAULT_CURRENCY] = value
 
 
 app_config = Config('./data/config.json', './data/payee_to_account.json')
