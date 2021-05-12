@@ -1,6 +1,7 @@
 import datetime
 from typing import List
 from enum import IntEnum
+
 from data_model.transaction import Transaction
 
 

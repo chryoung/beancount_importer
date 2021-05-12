@@ -31,13 +31,14 @@ python3 main.py
 
 - [ ] Add date selector
 - [ ] Support income transaction
-- [ ] Add wechat importer
+- [x] Add wechat importer
 - [ ] Generate payee to account map based on beancount file
 - [ ] Prevent duplicate transaction
 - [ ] i18n
 - [ ] Select by date range
 - [ ] Separate from account and to account dialog
 - [ ] Save undone work
+- [ ] Support bill payment account to from account conversion
 
 ## Thanks
 

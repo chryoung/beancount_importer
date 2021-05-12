@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog, QMessageBox, QLin
 from PyQt5.QtGui import QIcon
 
 from importer.alipay import get_transactions_from_alipay_csv
+from importer.wechat import get_transactions_from_wechat_csv
 from config import app_config
 from .select_account_dialog import SelectAccountDialog
 from data_model.transaction import Transaction
@@ -29,6 +30,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.ui.openBeancountAccountAction.triggered.connect(self.select_beancount_file)
         self.ui.openAlipayCsvAction.triggered.connect(self.open_alipay_csv)
+        self.ui.openWechatCsvAction.triggered.connect(self.open_wechat_csv)
         self.ui.selectPaymentAccountBtn.clicked.connect(self.select_default_payment_account)
         self.ui.selectExpensesAccountBtn.clicked.connect(self.select_default_expenses_account)
         self.ui.defaultCurrencyComboBox.currentTextChanged.connect(self.set_default_currency)
@@ -117,6 +119,23 @@ class MainWindow(QMainWindow):
                 self._gen_func_set_transaction_currency_with_default_value())
         except Exception as e:
             QMessageBox.critical(self, self.tr('Failed to open Alipay csv'), self.tr('Failed to open Alipay csv: ') + str(e))
+
+    def open_wechat_csv(self):
+        recent_wechat_path = path.dirname(app_config.recent_wechat_file)
+        self.wechat_csv = QFileDialog.getOpenFileName(
+            self, self.tr('Open Wechat CSV file'), recent_wechat_path, 'CSV (*.csv *.txt)')[0]
+        if not os.path.isfile(self.wechat_csv):
+            return
+        app_config.recent_wechat_file = self.wechat_csv
+        try:
+            transactions = get_transactions_from_wechat_csv(self.wechat_csv)
+            self.transaction_item_model.set_transactions_data(transactions)
+            self.transaction_item_model.update_transactions_data(
+                self._gen_func_set_transaction_account_with_default_value())
+            self.transaction_item_model.update_transactions_data(
+                self._gen_func_set_transaction_currency_with_default_value())
+        except Exception as e:
+            QMessageBox.critical(self, self.tr('Failed to open Wechat csv'), self.tr('Failed to open Wechat csv: ') + str(e))
 
     def select_import_file(self):
         import_file = QFileDialog.getSaveFileName(self, self.tr('Import to'), '/', 'beancount (*.beancount *.txt)')
