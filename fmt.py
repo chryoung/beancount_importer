@@ -1,4 +1,4 @@
-from transaction import Transaction
+from data_model.transaction import Transaction
 
 
 def format_amount(amount: float, precision: int = 2) -> str:

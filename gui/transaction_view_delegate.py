@@ -1,25 +1,40 @@
-from PyQt5.QtWidgets import QStyledItemDelegate, QWidget, QHBoxLayout, QToolButton, QLineEdit, QComboBox, QDialog
+from PyQt5.QtWidgets import QStyledItemDelegate, QWidget, QHBoxLayout, QToolButton, QLineEdit, QComboBox
+from PyQt5.QtCore import pyqtSlot
 
-from transaction_item_model import TransactionItemModelHeaderIndex
-from select_account_dialog import SelectAccountDialog
+from data_model.transaction_item_model import TransactionItemModelHeaderIndex
+from .select_account_dialog import SelectAccountDialog
 from config import app_config
-from typing import Callable
+
+class LineEditWithButton(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.layout = QHBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+        self.line_edit = QLineEdit(self)
+        self.layout.addWidget(self.line_edit)
+        self.button = QToolButton(self)
+        self.button.setText('...')
+        self.layout.addWidget(self.button)
+        self.setFocusProxy(self.line_edit)
+        self.setLayout(self.layout)
+
+    @pyqtSlot(str, name='setLineEditText')
+    def setLineEditText(self, text: str):
+        self.line_edit.setText(text)
 
 
 class TransactionViewDelegate(QStyledItemDelegate):
-    ACCOUNT_LINE_EDIT = 'account_line_edit'
-    ACCOUNT_SELECT_BUTTON = 'account_select_button'
-
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.select_account_dialog = None
+        self.select_account_dialog: SelectAccountDialog
 
     def createEditor(self, parent, option, index):
         col = index.column()
 
         if col == TransactionItemModelHeaderIndex.CURRENCY:
             return self._create_currency_combobox_editor(parent, option, index)
-        if col == TransactionItemModelHeaderIndex.FROM_ACCOUNT:
+        if col == TransactionItemModelHeaderIndex.FROM_ACCOUNT or col == TransactionItemModelHeaderIndex.TO_ACCOUNT:
             return self._create_account_selection_editor(parent, option, index)
 
         return super().createEditor(parent, option, index)
@@ -30,18 +45,15 @@ class TransactionViewDelegate(QStyledItemDelegate):
         if col == TransactionItemModelHeaderIndex.CURRENCY:
             editor.setCurrentText(index.data())
         elif col == TransactionItemModelHeaderIndex.FROM_ACCOUNT or col == TransactionItemModelHeaderIndex.TO_ACCOUNT:
-            line_edit: QLineEdit = editor.findChild(QLineEdit, self.ACCOUNT_LINE_EDIT)
-            if line_edit is not None:
-                line_edit.setText(index.data())
-                line_edit.selectAll()
+            editor.line_edit.setText(index.data())
+            editor.line_edit.selectAll()
         else:
             super().setEditorData(editor, index)
 
     def setModelData(self, editor, model, index):
         col = index.column()
         if col == TransactionItemModelHeaderIndex.FROM_ACCOUNT or col == TransactionItemModelHeaderIndex.TO_ACCOUNT:
-            line_edit: QLineEdit = editor.findChild(QLineEdit, self.ACCOUNT_LINE_EDIT)
-            model.setData(index, line_edit.text())
+            model.setData(index, editor.line_edit.text())
         else:
             super().setModelData(editor, model, index)
 
@@ -54,22 +66,8 @@ class TransactionViewDelegate(QStyledItemDelegate):
         return combobox
 
     def _create_account_selection_editor(self, parent, option, index):
-        editor = QWidget(parent)
-        layout = QHBoxLayout(editor)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        line_edit = QLineEdit(editor)
-        line_edit.setObjectName(self.ACCOUNT_LINE_EDIT)
-        layout.addWidget(line_edit)
-        button = QToolButton(editor)
-        button.setText('...')
-        button.setObjectName(self.ACCOUNT_SELECT_BUTTON)
-        button.clicked.connect(self._select_account_action)
-        layout.addWidget(button)
-        editor.setLayout(layout)
+        editor = LineEditWithButton(parent)
+        editor.button.clicked.connect(self.select_account_dialog.open)
+        self.select_account_dialog.selectedAccount.connect(editor.setLineEditText)
 
         return editor
-
-    def _select_account_action(self):
-        self.select_account_dialog.open()
-        #self.select_account_dialog.finished.connect()

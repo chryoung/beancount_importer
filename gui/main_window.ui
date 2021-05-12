@@ -21,20 +21,6 @@
     </sizepolicy>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Transactions</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Default currency</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="3">
      <widget class="QPushButton" name="selectExpensesAccountBtn">
       <property name="text">
@@ -42,10 +28,24 @@
       </property>
      </widget>
     </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Transactions</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="3">
      <widget class="QPushButton" name="selectPaymentAccountBtn">
       <property name="text">
        <string>Select</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Default currency</string>
       </property>
      </widget>
     </item>
@@ -79,6 +79,23 @@
       </property>
      </widget>
     </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Export to</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1" colspan="2">
+     <widget class="QLineEdit" name="exportPathLE"/>
+    </item>
+    <item row="6" column="3">
+     <widget class="QPushButton" name="exportBtn">
+      <property name="text">
+       <string>Export</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -87,7 +104,7 @@
      <x>0</x>
      <y>0</y>
      <width>835</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFiles">
@@ -108,7 +125,7 @@
   </action>
   <action name="openBeancountAccountAction">
    <property name="text">
-    <string>Open beancount account</string>
+    <string>Open beancount</string>
    </property>
   </action>
   <action name="openWechatCsvAction">

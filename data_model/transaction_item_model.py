@@ -2,13 +2,14 @@ from typing import List, Callable
 from enum import IntEnum
 import datetime
 
-from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex, QCoreApplication
 
-from transaction import Transaction
+from .transaction import Transaction
 
+tr = QCoreApplication.translate
 
 class TransactionItemModelHeaderIndex(IntEnum):
-    IMPORT = 0
+    EXPORT = 0
     TRANSACTION_DATE = 1
     AMOUNT = 2
     CURRENCY = 3
@@ -21,14 +22,14 @@ class TransactionItemModelHeaderIndex(IntEnum):
 
 class TransactionItemModel(QAbstractTableModel):
     HEADERS = [
-        'Import',
-        'Transaction date',
-        'Amount',
-        'Currency',
-        'From account',
-        'To account',
-        'Payee',
-        'Description',
+        tr('TransactionItemModel', 'Export'),
+        tr('TransactionItemModel', 'Transaction date'),
+        tr('TransactionItemModel', 'Amount'),
+        tr('TransactionItemModel', 'Currency'),
+        tr('TransactionItemModel', 'From account'),
+        tr('TransactionItemModel', 'To account'),
+        tr('TransactionItemModel', 'Payee'),
+        tr('TransactionItemModel', 'Description'),
     ]
 
     def __init__(self, transactions: List[Transaction]):
@@ -60,8 +61,8 @@ class TransactionItemModel(QAbstractTableModel):
 
         transaction = self.transactions[row]
 
-        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
-            return Qt.Checked if transaction.will_import else Qt.Unchecked
+        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.EXPORT:
+            return Qt.Checked if transaction.will_export else Qt.Unchecked
         elif role == Qt.DisplayRole or role == Qt.EditRole:
             if col == TransactionItemModelHeaderIndex.TRANSACTION_DATE:
                 return str(transaction.transaction_date)
@@ -87,8 +88,8 @@ class TransactionItemModel(QAbstractTableModel):
         if row >= len(self.transactions) or col >= TransactionItemModelHeaderIndex.END:
             return False
 
-        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
-            self.transactions[row].will_import = (value == Qt.Checked)
+        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.EXPORT:
+            self.transactions[row].will_export = (value == Qt.Checked)
             return True
         elif role == Qt.EditRole:
             if col == TransactionItemModelHeaderIndex.AMOUNT:
@@ -120,7 +121,7 @@ class TransactionItemModel(QAbstractTableModel):
         return False
 
     def flags(self, index):
-        if index.column() == TransactionItemModelHeaderIndex.IMPORT:
+        if index.column() == TransactionItemModelHeaderIndex.EXPORT:
             return super().flags(index) | Qt.ItemIsUserCheckable
         else:
             return super().flags(index) | Qt.ItemIsEditable

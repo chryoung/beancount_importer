@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 from enum import IntEnum
-from transaction import Transaction
+from data_model.transaction import Transaction
 
 
 class AlipayCsvFieldIndex(IntEnum):

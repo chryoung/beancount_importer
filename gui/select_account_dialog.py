@@ -1,11 +1,9 @@
-from os import path
-
 from PyQt5.Qt import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QModelIndex
+from PyQt5.QtCore import QModelIndex, pyqtSignal
 from PyQt5.QtWidgets import QDialog
 
 from tree import Node
-from ui_select_account_dialog import Ui_Dialog
+from gui.ui_select_account_dialog import Ui_Dialog
 
 
 class AccountItemModel(QStandardItemModel):
@@ -53,6 +51,8 @@ class AccountItemModel(QStandardItemModel):
 
 
 class SelectAccountDialog(QDialog):
+    selectedAccount = pyqtSignal(str, name='selectedAccount')
+
     def __init__(self, account_hierarchy: Node, parent=None):
         super().__init__(parent)
         self.ui = Ui_Dialog()
@@ -80,3 +80,7 @@ class SelectAccountDialog(QDialog):
 
     def show_account_full_name(self, index):
         self.ui.accountFullName.setText(self.get_selected_account())
+
+    def accept(self):
+        self.selectedAccount.emit(self.get_selected_account())
+        super().accept()

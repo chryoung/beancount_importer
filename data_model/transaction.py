@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass(init=False)
 class Transaction:
-    will_import: bool
+    will_export: bool
     transaction_date: date
     payee: str
     description: str
@@ -15,7 +15,7 @@ class Transaction:
     is_modified: bool
 
     def __init__(self):
-        self.will_import = True
+        self.will_export = True
         self.transaction_date = date.today()
         self.payee = ''
         self.description = ''

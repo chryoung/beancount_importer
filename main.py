@@ -5,7 +5,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from config import app_config
-from main_window import MainWindow
+from gui.main_window import MainWindow
 
 
 def on_last_window_closed():
