@@ -11,26 +11,33 @@ class Config:
     DEFAULT_CURRENCY = 'default_currency'
     IMPORT_TO_FILE = 'import_to_file'
 
-    def __init__(self, config_file: str, payee_account_map_file: str):
+    PAYEE_TO_ACCOUNT = 'payee_to_account'
+    BILL_ACCOUNT_TO_FROM_ACCOUNT = 'bill_account_to_from_account'
+
+    def __init__(self, config_file: str, account_map_file: str):
         self._config_file = config_file
-        self._config_json = self.try_load_json(self._config_file)
-        self._payee_account_map_file = payee_account_map_file
-        self.payee_account_map = self.try_load_json(self._payee_account_map_file)
+        self._config_json = self.try_load_json(self._config_file, {})
+        self._account_map_file = account_map_file
+        self._account_map = self.try_load_json(account_map_file, {self.PAYEE_TO_ACCOUNT: {}, self.BILL_ACCOUNT_TO_FROM_ACCOUNT: {}})
         self.beancount_currency = []
 
     @staticmethod
-    def try_load_json(json_file_path: str) -> {}:
+    def try_load_json(json_file_path: str, default) -> {}:
         try:
             with open(json_file_path, encoding='utf-8') as fs:
-                return json.load(fs)
+                j = json.load(fs)
+                if not j:
+                    return default
+                else:
+                    return j
         except:
-            return {}
+            return default
 
     def save(self):
         with open(self._config_file, 'w', encoding='utf-8') as config:
             json.dump(self._config_json, config, indent=4, ensure_ascii=False)
-        with open(self._payee_account_map_file, 'w', encoding='utf-8') as payee_account_map_fs:
-            json.dump(self.payee_account_map, payee_account_map_fs, indent=4, ensure_ascii=False)
+        with open(self._account_map_file, 'w', encoding='utf-8') as account_map_file_fs:
+            json.dump(self._account_map, account_map_file_fs, indent=4, ensure_ascii=False)
 
     @property
     def recent_beancount_file(self):
@@ -91,8 +98,25 @@ class Config:
     def import_to_file(self, value):
         self._config_json[self.IMPORT_TO_FILE] = value
 
+    @property
+    def payee_account_map(self) -> dict:
+        return self._account_map[self.PAYEE_TO_ACCOUNT]
+
+    @payee_account_map.setter
+    def payee_account_map(self, value):
+        self._account_map[self.PAYEE_TO_ACCOUNT] = value
+
+    @property
+    def bill_account_to_from_account(self) -> dict:
+        return self._account_map[self.BILL_ACCOUNT_TO_FROM_ACCOUNT]
+
+    @bill_account_to_from_account.setter
+    def bill_account_to_from_account(self, value):
+        self._account_map[self.BILL_ACCOUNT_TO_FROM_ACCOUNT] = value
+
+
 _data_path = './data'
 if not path.isdir(_data_path):
     mkdir(_data_path)
 
-app_config = Config(F'{_data_path}/config.json', F'{_data_path}/payee_to_account.json')
+app_config = Config(F'{_data_path}/config.json', F'{_data_path}/account_map.json')

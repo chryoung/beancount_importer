@@ -2,8 +2,10 @@ from PyQt5.QtWidgets import QStyledItemDelegate, QWidget, QHBoxLayout, QToolButt
 from PyQt5.QtCore import pyqtSlot
 
 from data_model.transaction_item_model import TransactionItemModelHeaderIndex
-from .select_account_dialog import SelectAccountDialog
 from config import app_config
+
+from .select_account_dialog import SelectAccountDialog
+
 
 class LineEditWithButton(QWidget):
     def __init__(self, parent=None):

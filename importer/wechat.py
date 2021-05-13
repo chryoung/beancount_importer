@@ -4,6 +4,10 @@ from enum import IntEnum
 
 from data_model.transaction import Transaction
 
+HEADER_LINE = 16
+TRANSACTION_START_LINE = 17
+TRANSACTION_END_LINE = -1
+
 
 class WechatCsvFieldIndex(IntEnum):
     TRANSACTION_DATETIME = 0
@@ -18,9 +22,6 @@ class WechatCsvFieldIndex(IntEnum):
     SELLER_RECEIPT_ID = 9
     MEMO = 10
 
-HEADER_LINE = 16
-TRANSACTION_START_LINE = 17
-TRANSACTION_END_LINE = -1
 
 def convert_line_to_transaction(transaction: List[str]) -> Transaction:
     tx = Transaction()

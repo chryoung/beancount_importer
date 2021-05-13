@@ -104,7 +104,7 @@
      <x>0</x>
      <y>0</y>
      <width>835</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFiles">
@@ -115,7 +115,15 @@
     <addaction name="openAlipayCsvAction"/>
     <addaction name="openWechatCsvAction"/>
    </widget>
+   <widget class="QMenu" name="menuAccount_Map">
+    <property name="title">
+     <string>Account Map</string>
+    </property>
+    <addaction name="payeeToAccountAction"/>
+    <addaction name="billAccountToFromAccountAction"/>
+   </widget>
    <addaction name="menuFiles"/>
+   <addaction name="menuAccount_Map"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openAlipayCsvAction">
@@ -131,6 +139,16 @@
   <action name="openWechatCsvAction">
    <property name="text">
     <string>Open Wechat csv</string>
+   </property>
+  </action>
+  <action name="payeeToAccountAction">
+   <property name="text">
+    <string>Payee to account</string>
+   </property>
+  </action>
+  <action name="billAccountToFromAccountAction">
+   <property name="text">
+    <string>Bill account to From account</string>
    </property>
   </action>
  </widget>

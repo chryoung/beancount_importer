@@ -15,7 +15,7 @@ beancount importer is a GUI tool for importing Alipay/Wechat (and maybe more) bi
 
 ## Prerequisite
 
-- Install Python 3 (>= 3.7)
+- Install Python 3 (>= 3.6)
 
 ```
 pip install beancount PyQt5

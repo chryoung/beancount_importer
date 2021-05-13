@@ -8,7 +8,6 @@ from PyQt5.QtGui import QIcon
 from importer.alipay import get_transactions_from_alipay_csv
 from importer.wechat import get_transactions_from_wechat_csv
 from config import app_config
-from .select_account_dialog import SelectAccountDialog
 from data_model.transaction import Transaction
 from data_model.transaction_item_model import TransactionItemModel
 from gui.ui_main_window import Ui_MainWindow
@@ -16,6 +15,9 @@ from gui.transaction_view_delegate import TransactionViewDelegate
 from beancount_account import get_operating_currencies, generate_account_hierarchy
 from fmt import format_transaction
 from data_model.tree import Node
+
+from .select_account_dialog import SelectAccountDialog
+from .account_map_dialog import AccountMapDialog
 
 
 class MainWindow(QMainWindow):
@@ -25,6 +27,7 @@ class MainWindow(QMainWindow):
         self.alipay_csv = ''
         self.transaction_item_model = TransactionItemModel([])
         self.transaction_view_delegate = TransactionViewDelegate(self)
+        self._account_map_dialog = AccountMapDialog(self)
 
     def setupUi(self):
         self.ui.setupUi(self)
@@ -52,6 +55,10 @@ class MainWindow(QMainWindow):
         importToPathLE_action = self.ui.importToPathLE.addAction(open_file_icon, QLineEdit.ActionPosition.TrailingPosition)
         importToPathLE_action.triggered.connect(self.select_import_file)
         self.ui.importBtn.clicked.connect(self.import_transaction)
+
+        # setup account map menu action
+        self.ui.payeeToAccountAction.triggered.connect(self.edit_payee_to_account)
+        self.ui.billAccountToFromAccountAction.triggered.connect(self.edit_bill_account_to_from_account)
 
     def setup_beancount_option(self, beancount_file: str):
         try:
@@ -175,3 +182,27 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, self.tr('Imported'), self.tr('Imported {0} transactions').format(len(transaction_text_lines)))
         except IOError as e:
             QMessageBox.critical(self, self.tr('Cannot import transactions'), self.tr('Cannot import transactions: ') + str(e))
+
+    def set_payee_to_account(self, value):
+        app_config.payee_account_map = value
+
+    def set_bill_account_to_from_account(self, value):
+        app_config.bill_account_to_from_account = value
+
+    def edit_payee_to_account(self):
+        self._account_map_dialog.set_account_map(app_config.payee_account_map, self.tr('Payee to account'), [self.tr('Payee'), self.tr('Account')])
+        try:
+            self._account_map_dialog.finishEdit.disconnect()
+        except:
+            pass
+        self._account_map_dialog.finishEdit.connect(self.set_payee_to_account)
+        self._account_map_dialog.open()
+
+    def edit_bill_account_to_from_account(self):
+        self._account_map_dialog.set_account_map(app_config.bill_account_to_from_account, self.tr('Bill account to From account'), [self.tr('Bill account'), self.tr('From account')])
+        try:
+            self._account_map_dialog.finishEdit.disconnect()
+        except:
+            pass
+        self._account_map_dialog.finishEdit.connect(self.set_bill_account_to_from_account)
+        self._account_map_dialog.open()
