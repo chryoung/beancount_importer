@@ -2,7 +2,7 @@ import os
 from os import path
 from typing import Callable
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog, QMessageBox, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog, QMessageBox, QLineEdit, QProgressDialog
 from PyQt5.QtGui import QIcon
 
 from importer.alipay import get_transactions_from_alipay_csv
@@ -15,6 +15,7 @@ from gui.transaction_view_delegate import TransactionViewDelegate
 from beancount_account import get_operating_currencies, generate_account_hierarchy
 from fmt import format_transaction
 from data_model.tree import Node
+from trainer.payee_to_account_trainer import PayeeToAccountTrainer
 
 from .select_account_dialog import SelectAccountDialog
 from .account_map_dialog import AccountMapDialog
@@ -31,9 +32,18 @@ class MainWindow(QMainWindow):
 
     def setupUi(self):
         self.ui.setupUi(self)
+
+        # setup file menu action trigger
         self.ui.openBeancountAccountAction.triggered.connect(self.select_beancount_file)
         self.ui.openAlipayCsvAction.triggered.connect(self.open_alipay_csv)
         self.ui.openWechatCsvAction.triggered.connect(self.open_wechat_csv)
+
+        # setup account map menu action
+        self.ui.payeeToAccountAction.triggered.connect(self.edit_payee_to_account)
+        self.ui.billAccountToFromAccountAction.triggered.connect(self.edit_bill_account_to_from_account)
+        self.ui.trainPayeeToAccountMapAction.triggered.connect(self.train_payee_to_account)
+
+        # setup default value button and line edit
         self.ui.selectPaymentAccountBtn.clicked.connect(self.select_default_payment_account)
         self.ui.selectExpensesAccountBtn.clicked.connect(self.select_default_expenses_account)
         self.ui.defaultCurrencyComboBox.currentTextChanged.connect(self.set_default_currency)
@@ -55,10 +65,6 @@ class MainWindow(QMainWindow):
         importToPathLE_action = self.ui.importToPathLE.addAction(open_file_icon, QLineEdit.ActionPosition.TrailingPosition)
         importToPathLE_action.triggered.connect(self.select_import_file)
         self.ui.importBtn.clicked.connect(self.import_transaction)
-
-        # setup account map menu action
-        self.ui.payeeToAccountAction.triggered.connect(self.edit_payee_to_account)
-        self.ui.billAccountToFromAccountAction.triggered.connect(self.edit_bill_account_to_from_account)
 
     def setup_beancount_option(self, beancount_file: str):
         try:
@@ -206,3 +212,27 @@ class MainWindow(QMainWindow):
             pass
         self._account_map_dialog.finishEdit.connect(self.set_bill_account_to_from_account)
         self._account_map_dialog.open()
+
+    def train_payee_to_account(self):
+        if not os.path.isfile(app_config.recent_beancount_file):
+            QMessageBox.critical(self, self.tr('Error'), self.tr('No beancount file is open for traning.'))
+            return
+        dialog = QProgressDialog(self.tr('Training...'), self.tr('Abort training'), 0, 100, self)
+        trainer = PayeeToAccountTrainer(self)
+        trainer.trainProgress.connect(dialog.setValue)
+        dialog.canceled.connect(trainer.cancel)
+        dialog.open()
+        try:
+            result = trainer.train(app_config.recent_beancount_file)
+            for (payee, account) in result.items():
+                if payee in app_config.payee_account_map and app_config.payee_account_map[payee] != account:
+                    overwrite = QMessageBox.question(self,
+                                                     self.tr('Overwrite?'),
+                                                     self.tr('{0} already exists on payee to account map with value {1}. Do you want to overwite it with {2}?').format(payee, app_config.payee_account_map[payee], account))
+                    if overwrite == QMessageBox.Yes:
+                        app_config.payee_account_map[payee] = account
+                else:
+                    app_config.payee_account_map[payee] = account
+        except Exception as e:
+            QMessageBox.critical(self, self.tr('Error'), self.tr('An error occurred while training: {0}.').format(e))
+            dialog.close()

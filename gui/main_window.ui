@@ -121,6 +121,8 @@
     </property>
     <addaction name="payeeToAccountAction"/>
     <addaction name="billAccountToFromAccountAction"/>
+    <addaction name="separator"/>
+    <addaction name="trainPayeeToAccountMapAction"/>
    </widget>
    <addaction name="menuFiles"/>
    <addaction name="menuAccount_Map"/>
@@ -149,6 +151,11 @@
   <action name="billAccountToFromAccountAction">
    <property name="text">
     <string>Bill account to From account</string>
+   </property>
+  </action>
+  <action name="trainPayeeToAccountMapAction">
+   <property name="text">
+    <string>Train Payee to account map</string>
    </property>
   </action>
  </widget>
