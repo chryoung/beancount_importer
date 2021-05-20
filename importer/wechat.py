@@ -2,7 +2,7 @@ import datetime
 from typing import List
 from enum import IntEnum
 
-from data_model.transaction import Transaction
+from data_model.transaction import Transaction, TransactionDirection
 
 HEADER_LINE = 16
 TRANSACTION_START_LINE = 17
@@ -28,8 +28,10 @@ def convert_line_to_transaction(transaction: List[str]) -> Transaction:
     transaction_date = transaction[WechatCsvFieldIndex.TRANSACTION_DATETIME]
     tx.transaction_date = datetime.datetime.strptime(transaction_date, '%Y-%m-%d %H:%M:%S').date()
     tx.payee = transaction[WechatCsvFieldIndex.PAYEE]
-    tx.description = transaction[WechatCsvFieldIndex.MERCHANDISE_NAME]
+    tx.description = transaction[WechatCsvFieldIndex.MERCHANDISE_NAME][1:-2]
     tx.amount = float(transaction[WechatCsvFieldIndex.AMOUNT][1:])
+    tx.bill_payment_account = transaction[WechatCsvFieldIndex.PAYMENT_ACCOUNT]
+    tx.direction = TransactionDirection.EXPENSES if transaction[WechatCsvFieldIndex.DIRECTION] == '支出' else TransactionDirection.INCOME
 
     return tx
 

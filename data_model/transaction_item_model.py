@@ -4,9 +4,10 @@ import datetime
 
 from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex, QCoreApplication
 
-from .transaction import Transaction
+from .transaction import Transaction, TransactionDirection
 
 tr = QCoreApplication.translate
+
 
 class TransactionItemModelHeaderIndex(IntEnum):
     IMPORT = 0
@@ -17,7 +18,8 @@ class TransactionItemModelHeaderIndex(IntEnum):
     TO_ACCOUNT = 5
     PAYEE = 6
     DESCRIPTION = 7
-    END = 8
+    DIRECTION = 8
+    END = 9
 
 
 class TransactionItemModel(QAbstractTableModel):
@@ -30,6 +32,7 @@ class TransactionItemModel(QAbstractTableModel):
         tr('TransactionItemModel', 'To account'),
         tr('TransactionItemModel', 'Payee'),
         tr('TransactionItemModel', 'Description'),
+        tr('TransactionItemModel', 'Direction'),
     ]
 
     def __init__(self, transactions: List[Transaction]):
@@ -78,6 +81,8 @@ class TransactionItemModel(QAbstractTableModel):
                 return transaction.payee
             elif col == TransactionItemModelHeaderIndex.DESCRIPTION:
                 return transaction.description
+            elif col == TransactionItemModelHeaderIndex.DIRECTION:
+                return 'Expenses' if transaction.direction == TransactionDirection.EXPENSES else 'Income'
 
         return None
 
@@ -126,8 +131,10 @@ class TransactionItemModel(QAbstractTableModel):
     def flags(self, index):
         if index.column() == TransactionItemModelHeaderIndex.IMPORT:
             return super().flags(index) | Qt.ItemIsUserCheckable
-        else:
+        elif index.column() != TransactionItemModelHeaderIndex.DIRECTION:
             return super().flags(index) | Qt.ItemIsEditable
+        else:
+            return super().flags(index)
 
     def set_transactions_data(self, transactions: List[Transaction]):
         self.layoutAboutToBeChanged.emit()

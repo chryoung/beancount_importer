@@ -2,7 +2,7 @@ import datetime
 from typing import List
 from enum import IntEnum
 
-from data_model.transaction import Transaction
+from data_model.transaction import Transaction, TransactionDirection
 
 
 class AlipayCsvFieldIndex(IntEnum):
@@ -38,6 +38,7 @@ def convert_line_to_transaction(transaction: List[str]) -> Transaction:
     tx.payee = transaction[AlipayCsvFieldIndex.PAYEE]
     tx.description = transaction[AlipayCsvFieldIndex.MERCHANDISE_NAME]
     tx.amount = float(transaction[AlipayCsvFieldIndex.AMOUNT])
+    tx.direction = TransactionDirection.EXPENSES if transaction[AlipayCsvFieldIndex.DIRECTION] == '支出' else TransactionDirection.INCOME
 
     return tx
 

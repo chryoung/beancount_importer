@@ -161,7 +161,7 @@ class MainWindow(QMainWindow):
         default_expenses_account = self.ui.defaultExpensesAccountLE.text()
 
         def set_account(transaction):
-            transaction.from_account = default_payment_account
+            transaction.from_account = app_config.bill_account_to_from_account.get(transaction.bill_payment_account, default_payment_account)
             transaction.to_account = app_config.payee_account_map.get(transaction.payee, default_expenses_account)
 
         return set_account
