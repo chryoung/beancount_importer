@@ -1,6 +1,8 @@
+import logging
 import os
 from os import path
 from typing import Callable
+import traceback
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog, QMessageBox, QLineEdit, QProgressDialog
 from PyQt5.QtGui import QIcon
@@ -71,9 +73,12 @@ class MainWindow(QMainWindow):
             accounts = generate_account_hierarchy(beancount_file)
             app_config.beancount_currency = get_operating_currencies(beancount_file)
         except Exception as e:
+            trace = traceback.format_exc()
+            logging.error('Failed to load beancount file: {0}\n{1}'.format(e, trace))
+
             accounts = Node('root')
             app_config.beancount_currency = []
-            QMessageBox.critical(self, self.tr('Error'), self.tr('Failed to load beancount file: {0}').format(e))
+            QMessageBox.critical(self, self.tr('Error'), self.tr('Failed to load beancount file: {0}\n{1}').format(e, trace))
         self.select_account_dialog = SelectAccountDialog(accounts, parent=self)
         self.select_account_dialog.setupUi()
         self.transaction_view_delegate.select_account_dialog = self.select_account_dialog
@@ -82,6 +87,7 @@ class MainWindow(QMainWindow):
             self.ui.defaultCurrencyComboBox.addItem(currency)
 
     def select_beancount_file(self):
+        logging.debug('Select beancount file.')
         recent_beancount_path = path.dirname(app_config.recent_beancount_file)
         app_config.recent_beancount_file = QFileDialog.getOpenFileName(self, self.tr('Open beancount file'), recent_beancount_path,
                                                                        'beancount (*.beancount *.bc *.txt)')[0]
@@ -90,33 +96,39 @@ class MainWindow(QMainWindow):
         self.setup_beancount_option(app_config.recent_beancount_file)
 
     def set_default_payment_account(self, account):
+        logging.debug('Set default payment account.')
         self.ui.defaultPaymentAccountLE.setText(account)
         app_config.default_payment_account = account
         self.transaction_item_model.update_transactions_data(
             self._gen_func_set_transaction_account_with_default_value())
 
     def select_default_payment_account(self):
+        logging.debug('Select default payment account.')
         if self.select_account_dialog.exec() == QDialog.Accepted:
             account = self.select_account_dialog.get_selected_account()
             self.set_default_payment_account(account)
 
     def set_default_expenses_account(self, account):
+        logging.debug('Set default expenses account.')
         self.ui.defaultExpensesAccountLE.setText(account)
         app_config.default_expenses_account = account
         self.transaction_item_model.update_transactions_data(
             self._gen_func_set_transaction_account_with_default_value())
 
     def select_default_expenses_account(self):
+        logging.debug('Select default expenses account.')
         if self.select_account_dialog.exec() == QDialog.Accepted:
             account = self.select_account_dialog.get_selected_account()
             self.set_default_expenses_account(account)
 
     def set_default_currency(self, currency):
+        logging.debug('Set default currency.')
         app_config.default_currency = currency
         self.transaction_item_model.update_transactions_data(
             self._gen_func_set_transaction_currency_with_default_value())
 
     def open_alipay_csv(self):
+        logging.debug('Open Alipay CSV.')
         recent_alipay_path = path.dirname(app_config.recent_alipay_file)
         self.alipay_csv = QFileDialog.getOpenFileName(
             self, self.tr('Open Alipay CSV file'), recent_alipay_path, 'CSV (*.csv *.txt)')[0]
@@ -131,9 +143,12 @@ class MainWindow(QMainWindow):
             self.transaction_item_model.update_transactions_data(
                 self._gen_func_set_transaction_currency_with_default_value())
         except Exception as e:
-            QMessageBox.critical(self, self.tr('Failed to open Alipay csv'), self.tr('Failed to open Alipay csv: ') + str(e))
+            trace = traceback.format_exc()
+            logging.error('Failed to open Alipay csv: {0}\n{1}'.format(e, trace))
+            QMessageBox.critical(self, self.tr('Failed to open Alipay csv'), self.tr('Failed to open Alipay csv: ') + '{0}\n{1}'.format(e, trace))
 
     def open_wechat_csv(self):
+        logging.debug('Open Wechat CSV.')
         recent_wechat_path = path.dirname(app_config.recent_wechat_file)
         self.wechat_csv = QFileDialog.getOpenFileName(
             self, self.tr('Open Wechat CSV file'), recent_wechat_path, 'CSV (*.csv *.txt)')[0]
@@ -148,9 +163,12 @@ class MainWindow(QMainWindow):
             self.transaction_item_model.update_transactions_data(
                 self._gen_func_set_transaction_currency_with_default_value())
         except Exception as e:
-            QMessageBox.critical(self, self.tr('Failed to open Wechat csv'), self.tr('Failed to open Wechat csv: ') + str(e))
+            trace = traceback.format_exc()
+            logging.error('Failed to open Wechat csv: {0}\n{1}'.format(e, trace))
+            QMessageBox.critical(self, self.tr('Failed to open Wechat csv'), self.tr('Failed to open Wechat csv: ') + '{0}\n{1}'.format(e, trace))
 
     def select_import_file(self):
+        logging.debug('Select import file.')
         import_file = QFileDialog.getSaveFileName(self, self.tr('Import to'), '/', 'beancount (*.beancount *.txt)')
         if import_file[0]:
             self.ui.importToPathLE.setText(import_file[0])
@@ -175,6 +193,7 @@ class MainWindow(QMainWindow):
         return set_currency
 
     def import_transaction(self):
+        logging.debug('Import transaction.')
         import_file = self.ui.importToPathLE.text()
         if not import_file:
             QMessageBox.warning(self, self.tr('Import path is not set!'), self.tr('Import path is not set! Please set an import path first.'))
@@ -185,17 +204,22 @@ class MainWindow(QMainWindow):
         try:
             with open(import_file, 'a', encoding='utf-8') as import_file_fs:
                 import_file_fs.write(transactions_text)
-            QMessageBox.information(self, self.tr('Imported'), self.tr('Imported {0} transactions').format(len(transaction_text_lines)))
+            QMessageBox.debugrmation(self, self.tr('Imported'), self.tr('Imported {0} transactions').format(len(transaction_text_lines)))
         except IOError as e:
-            QMessageBox.critical(self, self.tr('Cannot import transactions'), self.tr('Cannot import transactions: ') + str(e))
+            trace = traceback.format_exc()
+            logging.error('Cannot import transactions: {0}\n{1}'.format(e, trace))
+            QMessageBox.critical(self, self.tr('Cannot import transactions'), self.tr('Cannot import transactions: ') + '{0}\n{1}'.format(e, trace))
 
     def set_payee_to_account(self, value):
+        logging.debug('Set payee to account.')
         app_config.payee_account_map = value
 
     def set_bill_account_to_from_account(self, value):
+        logging.debug('Set bill "Account to" from account.')
         app_config.bill_account_to_from_account = value
 
     def edit_payee_to_account(self):
+        logging.debug('Edit "Payee to" account')
         self._account_map_dialog.set_account_map(app_config.payee_account_map, self.tr('Payee to account'), [self.tr('Payee'), self.tr('Account')])
         try:
             self._account_map_dialog.finishEdit.disconnect()
@@ -205,6 +229,7 @@ class MainWindow(QMainWindow):
         self._account_map_dialog.open()
 
     def edit_bill_account_to_from_account(self):
+        logging.debug('Edit bill "account to" from account.')
         self._account_map_dialog.set_account_map(app_config.bill_account_to_from_account, self.tr('Bill account to From account'), [self.tr('Bill account'), self.tr('From account')])
         try:
             self._account_map_dialog.finishEdit.disconnect()
@@ -214,6 +239,7 @@ class MainWindow(QMainWindow):
         self._account_map_dialog.open()
 
     def train_payee_to_account(self):
+        logging.debug("Train payee to account.")
         if not os.path.isfile(app_config.recent_beancount_file):
             QMessageBox.critical(self, self.tr('Error'), self.tr('No beancount file is open for traning.'))
             return
@@ -234,5 +260,7 @@ class MainWindow(QMainWindow):
                 else:
                     app_config.payee_account_map[payee] = account
         except Exception as e:
-            QMessageBox.critical(self, self.tr('Error'), self.tr('An error occurred while training: {0}.').format(e))
+            trace = traceback.format_exc()
+            logging.error('An error occurred while training: {0}\n{1}'.format(e, trace))
+            QMessageBox.critical(self, self.tr('Error'), self.tr('An error occurred while training: {0}\n{1}').format(e, trace))
             dialog.close()
