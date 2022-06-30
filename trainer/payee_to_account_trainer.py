@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal, QCoreApplication
+from PyQt6.QtCore import QObject, pyqtSignal, QCoreApplication
 import beancount.loader
 from beancount.core import data
 

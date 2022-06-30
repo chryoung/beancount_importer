@@ -2,3 +2,5 @@ __pycache__/
 /venv/
 /data/
 /.idea/
+.DS_Store
+

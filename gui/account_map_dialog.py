@@ -1,7 +1,7 @@
 from typing import Dict, List
 
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QDialog, QTableWidgetItem
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtWidgets import QDialog, QTableWidgetItem
 
 from .ui_account_map_dialog import Ui_AccountMapDialog
 
@@ -45,7 +45,7 @@ class AccountMapDialog(QDialog):
             key_item = self.ui.accountMapTableWidget.item(row_index, self.KEY_COLUMN)
             value_item = self.ui.accountMapTableWidget.item(row_index, self.VALUE_COLUMN)
             if key_item:
-                account_map[key_item.data(Qt.DisplayRole)] = value_item.data(Qt.DisplayRole)
+                account_map[key_item.data(Qt.ItemDataRole.DisplayRole)] = value_item.data(Qt.DisplayRole)
         self.finishEdit.emit(account_map)
 
     def accept(self):

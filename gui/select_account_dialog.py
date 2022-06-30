@@ -1,6 +1,6 @@
-from PyQt5.Qt import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QModelIndex, pyqtSignal
-from PyQt5.QtWidgets import QDialog
+from PyQt6.QtGui import QStandardItemModel, QStandardItem
+from PyQt6.QtCore import QModelIndex, pyqtSignal
+from PyQt6.QtWidgets import QDialog
 
 from data_model.tree import Node
 from gui.ui_select_account_dialog import Ui_Dialog

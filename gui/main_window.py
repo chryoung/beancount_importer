@@ -4,8 +4,8 @@ from os import path
 from typing import Callable
 import traceback
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog, QMessageBox, QLineEdit, QProgressDialog
-from PyQt5.QtGui import QIcon
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QDialog, QMessageBox, QLineEdit, QProgressDialog
+from PyQt6.QtGui import QIcon
 
 from importer.alipay import get_transactions_from_alipay_csv
 from importer.wechat import get_transactions_from_wechat_csv

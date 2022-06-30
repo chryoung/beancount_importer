@@ -15,10 +15,10 @@ beancount importer is a GUI tool for importing Alipay/Wechat (and maybe more) bi
 
 ## Prerequisite
 
-- Install Python 3 (>= 3.6)
+- Install Python 3 (>= 3.9)
 
 ```
-pip install beancount PyQt5
+pip install -r requirements.txt
 ```
 
 ## Run
@@ -32,7 +32,7 @@ python3 main.py
 - [ ] Add date selector
 - [ ] Support income transaction
 - [x] Add wechat importer
-- [ ] Generate payee to account map based on beancount file
+- [x] Generate payee to account map based on beancount file
 - [ ] Prevent duplicate transaction
 - [ ] i18n
 - [ ] Select by date range

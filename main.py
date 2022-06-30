@@ -4,7 +4,7 @@ import logging
 import logging.handlers
 import sys
 
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 
 from config import app_config
 from gui.main_window import MainWindow
@@ -33,4 +33,4 @@ if __name__ == '__main__':
     main_window.show()
 
     logging.info('Exit.')
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

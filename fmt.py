@@ -2,9 +2,9 @@ from data_model.transaction import Transaction
 
 
 def format_amount(amount: float, precision: int = 2) -> str:
-    fmt = '{:.' + str(precision) + 'f}'
+    str_fmt = '{:.' + str(precision) + 'f}'
 
-    return fmt.format(amount)
+    return str_fmt.format(amount)
 
 
 def number_length_before_dot(f: float) -> int:

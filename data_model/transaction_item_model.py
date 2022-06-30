@@ -2,7 +2,7 @@ from typing import List, Callable
 from enum import IntEnum
 import datetime
 
-from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex, QCoreApplication
+from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex, QCoreApplication
 
 from .transaction import Transaction, TransactionDirection
 
@@ -45,17 +45,17 @@ class TransactionItemModel(QAbstractTableModel):
     def rowCount(self, parent=None) -> int:
         return len(self.transactions)
 
-    def headerData(self, section: int, orientation: Qt.Orientation, role=Qt.DisplayRole):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+    def headerData(self, section: int, orientation: Qt.Orientation, role=Qt.ItemDataRole.DisplayRole):
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 if section < TransactionItemModelHeaderIndex.END:
                     return self.HEADERS[section]
-            elif orientation == Qt.Vertical:
+            elif orientation == Qt.Orientation.Vertical:
                 return section + 1
 
         return None
 
-    def data(self, index: QModelIndex, role=Qt.DisplayRole):
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
         row = index.row()
         col = index.column()
 
@@ -66,7 +66,7 @@ class TransactionItemModel(QAbstractTableModel):
 
         if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
             return Qt.Checked if transaction.will_import else Qt.Unchecked
-        elif role == Qt.DisplayRole or role == Qt.EditRole:
+        elif role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
             if col == TransactionItemModelHeaderIndex.TRANSACTION_DATE:
                 return str(transaction.transaction_date)
             elif col == TransactionItemModelHeaderIndex.AMOUNT:
@@ -86,17 +86,17 @@ class TransactionItemModel(QAbstractTableModel):
 
         return None
 
-    def setData(self, index: QModelIndex, value, role: int = Qt.EditRole) -> bool:
+    def setData(self, index: QModelIndex, value, role: int = Qt.ItemDataRole.EditRole) -> bool:
         row = index.row()
         col = index.column()
 
         if row >= len(self.transactions) or col >= TransactionItemModelHeaderIndex.END:
             return False
 
-        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
+        if role == Qt.ItemDataRole.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
             self.transactions[row].will_import = (value == Qt.Checked)
             return True
-        elif role == Qt.EditRole:
+        elif role == Qt.ItemDataRole.EditRole:
             if col == TransactionItemModelHeaderIndex.AMOUNT:
                 self.transactions[row].amount = value
                 return True
