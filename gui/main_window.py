@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
 
     def select_default_payment_account(self):
         logging.debug('Select default payment account.')
-        if self.select_account_dialog.exec() == QDialog.Accepted:
+        if self.select_account_dialog.exec() == QDialog.DialogCode.Accepted:
             account = self.select_account_dialog.get_selected_account()
             self.set_default_payment_account(account)
 
@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
 
     def select_default_expenses_account(self):
         logging.debug('Select default expenses account.')
-        if self.select_account_dialog.exec() == QDialog.Accepted:
+        if self.select_account_dialog.exec() == QDialog.DialogCode.Accepted:
             account = self.select_account_dialog.get_selected_account()
             self.set_default_expenses_account(account)
 

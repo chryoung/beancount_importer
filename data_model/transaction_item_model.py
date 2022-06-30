@@ -64,8 +64,8 @@ class TransactionItemModel(QAbstractTableModel):
 
         transaction = self.transactions[row]
 
-        if role == Qt.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
-            return Qt.Checked if transaction.will_import else Qt.Unchecked
+        if role == Qt.ItemDataRole.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
+            return Qt.CheckState.Checked if transaction.will_import else Qt.CheckState.Unchecked
         elif role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
             if col == TransactionItemModelHeaderIndex.TRANSACTION_DATE:
                 return str(transaction.transaction_date)
@@ -82,7 +82,7 @@ class TransactionItemModel(QAbstractTableModel):
             elif col == TransactionItemModelHeaderIndex.DESCRIPTION:
                 return transaction.description
             elif col == TransactionItemModelHeaderIndex.DIRECTION:
-                return 'Expenses' if transaction.direction == TransactionDirection.EXPENSES else 'Income'
+                return tr('Expenses') if transaction.direction == TransactionDirection.EXPENSES else tr('Income')
 
         return None
 
@@ -94,7 +94,7 @@ class TransactionItemModel(QAbstractTableModel):
             return False
 
         if role == Qt.ItemDataRole.CheckStateRole and col == TransactionItemModelHeaderIndex.IMPORT:
-            self.transactions[row].will_import = (value == Qt.Checked)
+            self.transactions[row].will_import = (value == Qt.CheckState.Checked)
             return True
         elif role == Qt.ItemDataRole.EditRole:
             if col == TransactionItemModelHeaderIndex.AMOUNT:
@@ -130,9 +130,9 @@ class TransactionItemModel(QAbstractTableModel):
 
     def flags(self, index):
         if index.column() == TransactionItemModelHeaderIndex.IMPORT:
-            return super().flags(index) | Qt.ItemIsUserCheckable
+            return super().flags(index) | Qt.ItemFlag.ItemIsUserCheckable
         elif index.column() != TransactionItemModelHeaderIndex.DIRECTION:
-            return super().flags(index) | Qt.ItemIsEditable
+            return super().flags(index) | Qt.ItemFlag.ItemIsEditable
         else:
             return super().flags(index)
 
