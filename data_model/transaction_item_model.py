@@ -82,7 +82,7 @@ class TransactionItemModel(QAbstractTableModel):
             elif col == TransactionItemModelHeaderIndex.DESCRIPTION:
                 return transaction.description
             elif col == TransactionItemModelHeaderIndex.DIRECTION:
-                return tr('Expenses') if transaction.direction == TransactionDirection.EXPENSES else tr('Income')
+                return tr('TransactionItemModel', 'Expenses') if transaction.direction == TransactionDirection.EXPENSES else tr('TransactionItemModel', 'Income')
 
         return None
 

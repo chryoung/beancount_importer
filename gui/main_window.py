@@ -204,7 +204,7 @@ class MainWindow(QMainWindow):
         try:
             with open(import_file, 'a', encoding='utf-8') as import_file_fs:
                 import_file_fs.write(transactions_text)
-            QMessageBox.debugrmation(self, self.tr('Imported'), self.tr('Imported {0} transactions').format(len(transaction_text_lines)))
+            QMessageBox.information(self, self.tr('Imported'), self.tr('Imported {0} transactions').format(len(transaction_text_lines)))
         except IOError as e:
             trace = traceback.format_exc()
             logging.error('Cannot import transactions: {0}\n{1}'.format(e, trace))

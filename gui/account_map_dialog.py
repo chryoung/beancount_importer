@@ -45,7 +45,7 @@ class AccountMapDialog(QDialog):
             key_item = self.ui.accountMapTableWidget.item(row_index, self.KEY_COLUMN)
             value_item = self.ui.accountMapTableWidget.item(row_index, self.VALUE_COLUMN)
             if key_item:
-                account_map[key_item.data(Qt.ItemDataRole.DisplayRole)] = value_item.data(Qt.DisplayRole)
+                account_map[key_item.data(Qt.ItemDataRole.DisplayRole)] = value_item.data(Qt.ItemDataRole.DisplayRole)
         self.finishEdit.emit(account_map)
 
     def accept(self):
