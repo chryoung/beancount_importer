@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QStyledItemDelegate, QWidget, QHBoxLayout, QToolButton, QLineEdit, QComboBox
-from PyQt5.QtCore import pyqtSlot
+from PyQt6.QtWidgets import QStyledItemDelegate, QWidget, QHBoxLayout, QToolButton, QLineEdit, QComboBox
+from PyQt6.QtCore import pyqtSlot
 
 from data_model.transaction_item_model import TransactionItemModelHeaderIndex
 from config import app_config
