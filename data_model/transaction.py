@@ -1,5 +1,6 @@
 from datetime import date
 from enum import IntEnum
+from dataclasses import dataclass
 
 
 class TransactionDirection(IntEnum):
@@ -7,16 +8,17 @@ class TransactionDirection(IntEnum):
     INCOME = 1
 
 
+@dataclass
 class Transaction:
-    def __init__(self):
-        self.will_import = True
-        self.transaction_date = date.today()
-        self.payee = ''
-        self.description = ''
-        self.amount = 0
-        self.currency = ''
-        self.bill_payment_account = ''
-        self.direction = TransactionDirection.EXPENSES
-        self.from_account = ''
-        self.to_account = ''
-        self.is_modified = False
+    will_import: bool
+    transaction_date: date = date.today()
+    payee: str
+    description: str
+    amount: float
+    currency: str
+    bill_payment_account: str
+    direction: TransactionDirection
+    from_account: str
+    to_account: str
+    is_modified: bool
+

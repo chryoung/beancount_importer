@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem
 
@@ -20,7 +18,7 @@ class AccountMapDialog(QDialog):
         self.ui.deleteRowBtn.clicked.connect(self.delete_row)
         self.ui.accountMapTableWidget.setColumnCount(2)
 
-    def set_account_map(self, account_map: Dict[str, str], title: str = '', header: List[str] = None):
+    def set_account_map(self, account_map: dict[str, str], title: str = '', header: list[str] = None):
         if title:
             self.ui.mapTypeLabel.setText(title)
         self.ui.accountMapTableWidget.clear()

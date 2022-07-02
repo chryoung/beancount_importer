@@ -120,3 +120,4 @@ if not path.isdir(_data_path):
     mkdir(_data_path)
 
 app_config = Config(F'{_data_path}/config.json', F'{_data_path}/account_map.json')
+

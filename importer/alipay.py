@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 from enum import IntEnum
 
 from data_model.transaction import Transaction, TransactionDirection
@@ -31,7 +30,7 @@ TRANSACTION_END_LINE = -7
 IGNORE_STATE = ['退款成功', '交易关闭', '信用服务使用成功']
 
 
-def convert_line_to_transaction(transaction: List[str]) -> Transaction:
+def convert_line_to_transaction(transaction: list[str]) -> Transaction:
     tx = Transaction()
     transaction_date = transaction[AlipayCsvFieldIndex.PAYMENT_DATETIME]
     tx.transaction_date = datetime.datetime.strptime(transaction_date, '%Y-%m-%d %H:%M:%S').date()
@@ -43,7 +42,7 @@ def convert_line_to_transaction(transaction: List[str]) -> Transaction:
     return tx
 
 
-def get_transactions_from_alipay_csv(alipay_csv: str) -> List[Transaction]:
+def get_transactions_from_alipay_csv(alipay_csv: str) -> list[Transaction]:
     with open(alipay_csv, encoding='gbk') as alipay_file:
         alipay_transactions = [line for line in alipay_file]
 

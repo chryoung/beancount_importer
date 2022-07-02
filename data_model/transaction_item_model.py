@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import Callable
 from enum import IntEnum
 import datetime
 
@@ -35,7 +35,7 @@ class TransactionItemModel(QAbstractTableModel):
         tr('TransactionItemModel', 'Direction'),
     ]
 
-    def __init__(self, transactions: List[Transaction]):
+    def __init__(self, transactions: list[Transaction]):
         super().__init__()
         self.transactions = transactions
 
@@ -136,7 +136,7 @@ class TransactionItemModel(QAbstractTableModel):
         else:
             return super().flags(index)
 
-    def set_transactions_data(self, transactions: List[Transaction]):
+    def set_transactions_data(self, transactions: list[Transaction]):
         self.layoutAboutToBeChanged.emit()
         self.transactions = transactions
         self.layoutChanged.emit()

@@ -1,6 +1,5 @@
 import datetime
 import logging
-from typing import List
 from enum import IntEnum
 
 from data_model.transaction import Transaction, TransactionDirection
@@ -24,7 +23,7 @@ class WechatCsvFieldIndex(IntEnum):
     MEMO = 10
 
 
-def convert_line_to_transaction(line_number: int, transaction: List[str]) -> Transaction:
+def convert_line_to_transaction(line_number: int, transaction: list[str]) -> Transaction:
     tx = Transaction()
 
     # Get transaction date
@@ -56,7 +55,7 @@ def convert_line_to_transaction(line_number: int, transaction: List[str]) -> Tra
     return tx
 
 
-def get_transactions_from_wechat_csv(wechat_csv: str) -> List[Transaction]:
+def get_transactions_from_wechat_csv(wechat_csv: str) -> list[Transaction]:
     logging.debug('Get transactions from Wechat CSV.')
     with open(wechat_csv, encoding='utf-8') as wechat_file:
         wechat_transactions = [(no + 1, line) for no, line in enumerate(wechat_file)]
